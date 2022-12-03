@@ -1,10 +1,8 @@
-import {Router} from 'express';
 import axios from 'axios';
 import * as fs from 'fs';
-import {parse} from 'node-html-parser';
-import {Stream} from 'stream';
+import {Router} from 'express';
 
-const router: Router = Router();
+const router = Router();
 
 const findLatestDay = (): number => {
   const today = new Date();
@@ -12,52 +10,34 @@ const findLatestDay = (): number => {
   return today.getDate();
 };
 
-const createTheText = (html: string): string => {
-  let parsedHtml = parse(html);
+const createTheText = ({input, num}: {input: any; num: number}): string => {
+  const localText = input.toString();
+  const splitText = localText.split('main')[1];
+  const formattedText = splitText.substring(1, splitText.length - 3);
+  const beginning = `<!DOCTYPE html><html><head><title>Question ${num}</title></head><main>`;
+  const end = '</main></html>';
+  return beginning.concat(formattedText.concat(end));
 };
 
 const writeQuestionToFile = async (questionNum: number): Promise<void> => {
   const todaysQuestion = await axios.get(
     `https://adventofcode.com/2022/day/${questionNum}`
   );
-  console.log('TODAYS QUESTION: ', todaysQuestion);
-  console.log('todays question: ', todaysQuestion.data);
 
   if (todaysQuestion.data) {
-    const textToWrite = createTheText(todaysQuestion.data);
-    const stream = new Stream();
-    stream.pipe(data => {
-      data.write(textToWrite);
-    });
-    return new Promise<void>((resolve, reject): void => {
-      writableStream.pipe(
-        fs
-          .createWriteStream(`${__dirname}/questions/${questionNum}`, {
-            flags: 'r+',
-          })
-          .on('finish', (): void => resolve())
-          .on('error', e => {
-            console.log('Error', e);
-            reject();
-          })
+    return new Promise<void>((resolve, reject) => {
+      fs.writeFile(
+        `${__dirname}/questions/${questionNum}.html`,
+        createTheText({input: todaysQuestion.data, num: questionNum}),
+        err => {
+          if (err) {
+            reject(err);
+          }
+          resolve();
+        }
       );
     });
   }
-};
-
-const writeFileForQuestion = async (questionNum: number): Promise<void> => {
-  return new Promise<void>((resolve, reject): void => {
-    fs.writeFile(
-      `${__dirname}/questions/${questionNum}`,
-      'none',
-      (err): void => {
-        if (err) {
-          reject(err);
-        }
-        resolve();
-      }
-    );
-  });
 };
 
 const writeDirectoryForQuestions = async (): Promise<void> => {
@@ -71,7 +51,7 @@ const writeDirectoryForQuestions = async (): Promise<void> => {
   });
 };
 
-router.get('/', async (_, res): Promise<void> => {
+async function main(): Promise<number> {
   const questionToFetch = findLatestDay();
 
   // Write Directory
@@ -80,12 +60,17 @@ router.get('/', async (_, res): Promise<void> => {
   }
 
   // Write file and then serve
-  if (!(await fs.existsSync(`${__dirname}/questions/${questionToFetch}`))) {
-    await writeFileForQuestion(questionToFetch);
+  if (
+    !(await fs.existsSync(`${__dirname}/questions/${questionToFetch}.html`))
+  ) {
     await writeQuestionToFile(questionToFetch);
   }
 
-  res.sendFile(`${__dirname}/questions/${questionToFetch}`);
+  return questionToFetch;
+}
+router.get('/', async (req, res) => {
+  const questionToFetch = await main();
+  res.sendFile(`${__dirname}/questions/${questionToFetch}.html`);
 });
 
 export default router;
