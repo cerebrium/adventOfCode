@@ -1,5 +1,3 @@
-function runNickAnswers() {
-  console.log('hello world');
-}
+import main, {sampleData} from './questions/question3';
 
-runNickAnswers();
+console.log(main(sampleData));
