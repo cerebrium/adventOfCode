@@ -1,4 +1,4 @@
-import main from './questions/question1';
+import main from './questions/question2';
 
 async function runMain() {
   console.log('running this');
