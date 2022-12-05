@@ -1,3 +1,8 @@
-import main, {sampleData} from './questions/question3';
+import main from './questions/question1';
 
-console.log(main(sampleData));
+async function runMain() {
+  console.log('running this');
+  console.log(await main());
+}
+
+runMain();
