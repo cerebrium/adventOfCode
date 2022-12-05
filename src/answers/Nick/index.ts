@@ -1,5 +1,8 @@
-function runNickAnswers() {
-  console.log('hello world');
+import main from './questions/question1';
+
+async function runMain() {
+  console.log('running this');
+  console.log(await main());
 }
 
-runNickAnswers();
+runMain();
