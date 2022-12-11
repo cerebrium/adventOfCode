@@ -3,7 +3,9 @@
   "compilerOptions": {
     "rootDir": ".",
     "outDir": "build",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "noImplicitReturns": false,
+    "strict": false
   },
   "include": ["src/**/*.ts", "test/**/*.ts"]
 }
