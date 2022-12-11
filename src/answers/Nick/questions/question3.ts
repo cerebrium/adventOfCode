@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 /*
 
 
@@ -77,40 +78,75 @@ const priorities = {
   Z: 52,
 };
 
-function main(items: string[]) {
-  const rucksackStoreOne = [];
-  const rucksackStoreTwo = [];
+// ONE
+// function findTotal(input: string) {
+//   const items = input.split('\n');
 
-  for (const listItems of items) {
-    console.log('LIST ITEM: ', listItems);
-    rucksackStoreOne.push(
-      Array.from(
-        new Set(listItems.slice(0, listItems.length / 2 + 1).split(''))
-      )
-    );
-    rucksackStoreTwo.push(
-      new Set(listItems.slice(listItems.length / 2).split(''))
-    );
+//   console.log('items: ', items);
+//   let total = 0;
+
+//   for (const list of items) {
+//     const half = Math.floor(list.length / 2);
+//     const [ruckOne, ruckTwo] = [
+//       new Set(list.substring(0, half)),
+//       new Set(list.substring(half)),
+//     ];
+
+//     let common = null;
+//     ruckOne.forEach(el => {
+//       if (ruckTwo.has(el)) common = el;
+//     });
+
+//     if (common) total += priorities[common];
+//   }
+
+//   return total;
+// }
+
+// TWO
+function findTotal(input: string) {
+  const items = input.split('\n');
+  let total = 0;
+
+  /*
+
+    for each group of three, make sets from each row
+    then find what exists in all
+
+  */
+
+  for (let i = 3; i < items.length + 1; i += 3) {
+    const currentGroup = items.slice(i - 3, i);
+    const [one, two, three] = currentGroup.map(el => new Set(el));
+
+    const unionOneTwo = [];
+
+    one.forEach(el => {
+      if (two.has(el)) unionOneTwo.push(el);
+    });
+
+    const oneTwoThreeUnion = unionOneTwo.filter(el => three.has(el));
+
+    total += priorities[oneTwoThreeUnion[0]];
   }
 
-  const foundItems: string[] = [];
+  return total;
+}
 
-  for (let i = 0; i < rucksackStoreOne.length; i++) {
-    const rucksackTwoSet = rucksackStoreTwo[i];
-    const itemsInSacks: string[] = [];
-
-    for (const item of rucksackStoreOne[i]) {
-      if (rucksackTwoSet.has(item)) {
-        console.log('ITEM: ', item);
-        itemsInSacks.push(item);
+async function main(): Promise<unknown> {
+  return new Promise((resolve, reject): void => {
+    fs.readFile(
+      `${__dirname}/../../../../../assets/Nick/inputs/input3.txt`,
+      'utf8',
+      (err, data): void => {
+        if (err) {
+          console.log(err);
+          reject();
+        }
+        resolve(findTotal(data));
       }
-    }
-    if (itemsInSacks.length) foundItems.push(...itemsInSacks);
-  }
-
-  return foundItems.reduce((acc, curr: string) => {
-    return (acc += (priorities as any)[curr]);
-  }, 0);
+    );
+  });
 }
 
 export default main;

@@ -1,77 +1,104 @@
 import * as fs from 'fs';
 
+const sampleData = ['A Y', 'B X', 'C Z'];
+
 const baseScores = {
-  A: 1,
   X: 1,
   Y: 2,
-  B: 2,
-  C: 3,
   Z: 3,
 };
 
-enum Left {
-  a = 'A',
-  b = 'B',
-  c = 'C',
-}
-enum Right {
-  x = 'X',
-  y = 'Y',
-  z = 'Z',
-}
+/*
+  Round One
+  a & x: rock,
+  y & b: paper,
+  c & z: scissor
 
-function* createScores(data: string): Generator<[Left, Right]> {
-  let index = 0;
-  while (data[index]) {
-    const start = index;
+*/
 
-    while (data[index] !== '\n') {
-      index++;
-    }
+/*
 
-    yield data.substring(start, index).split(' ') as any;
-    index += 1;
-    console.log('length: ', data.length, 'index: ', index);
-  }
-}
+  Round Two
+  x: lose,
+  y: draw,
+  z: win
 
-const handleComputingScores = (data: string) => {
-  const generator = createScores(data);
-  try {
-    // eslint-disable-next-line no-constant-condition
-    while (true) {
-      const {value, done} = generator.next();
-      if (done) break;
-      const [left, right] = value;
-      if (baseScores[left] === baseScores[right]) {
-        console.log('tie');
-      }
-    }
-  } catch (err) {
-    console.log('error');
-    return err;
-  } finally {
-    /*
+*/
 
-        Final elements
-
-      */
-
-    const {value, done} = generator.next();
-    console.log('inside final');
-  }
-  console.log('finished');
+// for one
+const combinations = {
+  A: {
+    X: 3,
+    Y: 6,
+    Z: 0,
+  },
+  B: {
+    X: 0,
+    Y: 3,
+    Z: 6,
+  },
+  C: {
+    X: 6,
+    Y: 0,
+    Z: 3,
+  },
 };
+
+const twoCombinations = {
+  X: 0,
+  Y: 3,
+  Z: 6,
+};
+
+// Part one
+// function getCurrentLineAndCompare(data: string) {
+//   const input = data.split('\n');
+
+//   let score = 0;
+
+//   for (const pair of input) {
+//     const [opponent, me] = pair.split(' ');
+
+//     const amount = baseScores[me] + combinations[opponent][me];
+
+//     score += amount;
+//   }
+
+//   return score;
+// }
+
+// Part Two
+function getCurrentLineAndCompare(data: string) {
+  const input = data.split('\n');
+
+  let score = 0;
+
+  for (const pair of input) {
+    const [opponent, me] = pair.split(' ');
+
+    const amount = twoCombinations[me] + 1;
+
+    score += amount;
+  }
+
+  return score;
+}
+
+// 10009 --> wrong
 
 async function main(): Promise<unknown> {
   return new Promise((resolve, reject): void => {
-    fs.readFile(`${__dirname}/inputs/input2.txt`, 'utf8', (err, data): void => {
-      if (err) {
-        console.log(err);
-        reject();
+    fs.readFile(
+      `${__dirname}/../../../../../assets/Nick/inputs/input2.txt`,
+      'utf8',
+      (err, data): void => {
+        if (err) {
+          console.log(err);
+          reject();
+        }
+        resolve(getCurrentLineAndCompare(data));
       }
-      resolve(handleComputingScores(data));
-    });
+    );
   });
 }
 
