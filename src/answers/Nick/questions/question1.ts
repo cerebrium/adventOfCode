@@ -21,20 +21,17 @@ const sumIncomingData = (data: string): number => {
   }, 0);
 };
 
-async function main(): Promise<unknown> {
-  return new Promise((resolve, reject): void => {
-    fs.readFile(
-      `${__dirname}/../../../../../assets/Nick/inputs/input1.txt`,
-      'utf8',
-      (err, data): void => {
-        if (err) {
-          console.log(err);
-          reject();
-        }
-        resolve(sumIncomingData(data));
+function main() {
+  fs.readFile(
+    `${__dirname}/../../../../../assets/Nick/inputs/input1.txt`,
+    'utf8',
+    (err, data): void => {
+      if (err) {
+        console.log(err);
       }
-    );
-  });
+      sumIncomingData(data);
+    }
+  );
 }
 
 export default main;
